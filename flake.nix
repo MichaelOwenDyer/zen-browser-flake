@@ -6,24 +6,22 @@
   };
 
   outputs =
-    { self, nixpkgs }:
+    { nixpkgs, ... }:
     let
-      version = "1.12.3b";
-      downloadUrl = {
+      version = "1.13.2b";
+      tarballs = {
         "x86_64-linux" = {
           url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.linux-x86_64.tar.xz";
-          sha256 = "sha256:0kwh9wf5a4x2v6ls5jfl5a2schy6gb9aw8h7f6d1vzdci4cgx80g";
+          sha256 = "sha256:0hmb3zxjn961nd6c0ry5mbcr2iq38i1rvqs31qg99c7mcsv6zjal";
         };
         "aarch64-linux" = {
           url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.linux-aarch64.tar.xz";
-          sha256 = "sha256:b724640d21a9a2fff1eab1b160cef8f59755dea350243b3f600968dcd1910556";
+          sha256 = "sha256:1g0mzi0hs9xmpmpqkr2gqkwl8psflif55imcciy3p032qx7awjj1";
         };
       };
-
       mkZen =
-        { system }:
+        { pkgs, tarball }:
         let
-          pkgs = import nixpkgs { inherit system; };
           runtimeLibs =
             with pkgs;
             [
@@ -79,7 +77,7 @@
           inherit version;
           pname = "zen-browser";
 
-          src = builtins.fetchTarball downloadUrl."${system}";
+          src = builtins.fetchTarball tarball;
 
           desktopSrc = ./.;
 
@@ -120,9 +118,6 @@
         };
     in
     {
-      packages = {
-        x86_64-linux = mkZen { system = "x86_64-linux"; };
-        aarch64-linux = mkZen { system = "aarch64-linux"; };
-      };
+      packages = nixpkgs.lib.mapAttrs (system: tarball: mkZen { pkgs = nixpkgs.legacyPackages.${system}; inherit tarball; }) tarballs;
     };
 }
