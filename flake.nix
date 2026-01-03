@@ -8,15 +8,15 @@
   outputs =
     { nixpkgs, ... }:
     let
-      version = "1.13.2b";
+      version = "1.17.15b";
       tarballs = {
         "x86_64-linux" = {
           url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.linux-x86_64.tar.xz";
-          sha256 = "sha256:0hmb3zxjn961nd6c0ry5mbcr2iq38i1rvqs31qg99c7mcsv6zjal";
+          sha256 = "sha256:10g6ab4hd1f0gs25xyv3frw6mx4ci4q3rc7dl2wh085k7rn3glms";
         };
         "aarch64-linux" = {
           url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.linux-aarch64.tar.xz";
-          sha256 = "sha256:1g0mzi0hs9xmpmpqkr2gqkwl8psflif55imcciy3p032qx7awjj1";
+          sha256 = "sha256:1bbcmrxc8282gpk2hfdfhkv5fq866r4x6lg0wglckxabd7s65f1v";
         };
       };
       mkZen =
@@ -77,7 +77,7 @@
           inherit version;
           pname = "zen-browser";
 
-          src = builtins.fetchTarball tarball;
+          src = fetchTarball tarball;
 
           desktopSrc = ./.;
 
@@ -118,6 +118,12 @@
         };
     in
     {
-      packages = nixpkgs.lib.mapAttrs (system: tarball: mkZen { pkgs = nixpkgs.legacyPackages.${system}; inherit tarball; }) tarballs;
+      packages = nixpkgs.lib.mapAttrs (
+        system: tarball:
+        mkZen {
+          pkgs = nixpkgs.legacyPackages.${system};
+          inherit tarball;
+        }
+      ) tarballs;
     };
 }
