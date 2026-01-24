@@ -8,15 +8,15 @@
   outputs =
     { nixpkgs, ... }:
     let
-      version = "1.17.15b";
+      version = "1.18b";
       tarballs = {
         "x86_64-linux" = {
           url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.linux-x86_64.tar.xz";
-          sha256 = "sha256:10g6ab4hd1f0gs25xyv3frw6mx4ci4q3rc7dl2wh085k7rn3glms";
+          sha256 = "sha256:02aandxdcsmayf1lblyxh0vrq3p7mfg0s4zzd72vhnp0kyl75r8z";
         };
         "aarch64-linux" = {
           url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.linux-aarch64.tar.xz";
-          sha256 = "sha256:1bbcmrxc8282gpk2hfdfhkv5fq866r4x6lg0wglckxabd7s65f1v";
+          sha256 = "sha256:0q5b3i9d5ps8jr7h0g2a1472sykx3xq4hc6qp0pdxpc3i616p6iv";
         };
       };
       mkZen =
@@ -120,9 +120,15 @@
     {
       packages = nixpkgs.lib.mapAttrs (
         system: tarball:
-        mkZen {
-          pkgs = nixpkgs.legacyPackages.${system};
-          inherit tarball;
+        let
+          zen = mkZen {
+            pkgs = nixpkgs.legacyPackages.${system};
+            inherit tarball;
+          };
+        in
+        {
+          zen-browser = zen;
+          default = zen;
         }
       ) tarballs;
     };
